@@ -87,10 +87,16 @@ public class OrderSystem {
 		{
 			for(int j = 0 ; j<3;j++)
 			{
-				System.out.println(orderTable[j].Menu);
-				System.out.println(orderTable[j].Price);
-				System.out.println(orderTable[j].Qty);
-				System.out.println(orderTable[j].PriceSum);
+				if(orderTable[j]==null)
+				{
+				}
+				else
+				{
+					System.out.println(orderTable[j].Menu);
+					System.out.println(orderTable[j].Price);
+					System.out.println(orderTable[j].Qty);
+					System.out.println(orderTable[j].PriceSum);
+				}
 			}
 		}
 		else
