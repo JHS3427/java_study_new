@@ -2,7 +2,7 @@ package vending_machine_ver1;
 
 public class RestArea {
 	String name;
-	User jung;
+	User user;
 	VendingMachine machine;
 
 	//Constructor
@@ -12,10 +12,10 @@ public class RestArea {
 	}
 	public RestArea(String name)
 	{
-		this.name = name;
-		jung = new User("정국");
+		this.name = name;//객체 생성시 받은 파라미터 값의 사용 범위를 전체로 넓힘 = 멤버변수 초기화 작업
+		user = new User("정국");
 		welcome();
-		machine = new VendingMachine();
+		machine = new VendingMachine(user);
 	}
 	
 	public void welcome()

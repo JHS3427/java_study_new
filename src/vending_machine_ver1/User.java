@@ -18,17 +18,6 @@ public class User {
 	
 	
 	//Method
-	public boolean coinCheck(int coin)
-	{
-		boolean result = false;
-		
-		if(coin == 100 || coin == 500)
-		{
-			result = true;
-		}
-		return result;
-	}
-	
 	/*
 	 * 동전 입력
 	 */	
@@ -38,7 +27,7 @@ public class User {
 		System.out.print("["+name+"] 동전 입력>");
 		if(scan.hasNextInt())
 		{
-			//100원 또는 500원만 입력 가능
+			//100원 또는 500원만 입력 가능 - 이 기능은 벤딩머신쪽으로 빠짐
 			int coin = scan.nextInt();
 			resultCoin =coin;
 //			if(coinCheck(coin))
@@ -55,5 +44,19 @@ public class User {
 		return resultCoin;
 	}
 	
-	
+	/*
+	 * 메뉴 선택
+	 */
+	public int selectMenu() {
+		int menu = 0;
+		System.out.print("["+name+"]메뉴선택> ");
+		if(scan.hasNextInt()) {		
+			menu = scan.nextInt();
+		} else {
+			System.out.println("=> 올바르지 않은 값, 다시 입력해주세요");
+			scan.next();
+			//insertCoin();
+		}
+		return menu;
+	}
 }
