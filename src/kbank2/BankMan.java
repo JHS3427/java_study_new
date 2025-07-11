@@ -40,7 +40,7 @@ public class BankMan {
 	
 	
 	public AccountVo[] createAccountList()
-	{
+	{//names~list까지는 stack에 저장되지만 메소드 끝나면 전부 사라진다.
 		String[] names = {"홍길동","이순신","김유신"};
 		String[] numbers = {"kb-1234","kb-9876","kb-3456"};
 		String[] passwords = {"1234","9876","3456"};
