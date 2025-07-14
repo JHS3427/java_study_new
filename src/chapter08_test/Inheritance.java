@@ -19,6 +19,9 @@ public class Inheritance {
 		
 		Round Round = new Round("Black",5,5,5);
 		Round.areaPrint();
+		
+		Square Square = new Square();
+		Square.areaPrint();
 	}
 
 }

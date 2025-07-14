@@ -20,6 +20,6 @@ public class Shape {
 		return result;		
 	}
 	
-	public void areaPrint() {};
+	public void areaPrint() {System.out.println("난 몰라");}
 	
 }
