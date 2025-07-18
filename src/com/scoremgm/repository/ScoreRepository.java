@@ -8,4 +8,7 @@ public interface ScoreRepository {
 	public boolean insert(Member member);
 	int getCount();
 	public List<Member> findAll();
+	Member find(String no);
+	void update(Member member);
+	void remove(String no);
 }
