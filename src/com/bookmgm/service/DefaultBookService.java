@@ -93,7 +93,7 @@ public class DefaultBookService implements BookService {
 		bma.showMenu();
 	}
 	/**
-	 * 도서 출력 - 검색 수정 시 결과 출력.ㄱㄷㄱ
+	 * 도서 출력 - 검색 수정 시 결과 출력.
 	 */
 
 	public void printBook(Book book)

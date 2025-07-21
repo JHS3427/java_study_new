@@ -58,6 +58,9 @@ public class InMemoryBookRepository implements BookRepository{
 		for(Book b : library) {
 			if(b.getId().equals(book.getId()))
 			{
+				System.out.println("깊은복사 확인");
+				System.out.println(b.getAuthor());
+				System.out.println(book.getAuthor());
 				idx = i;
 				break;
 			}
