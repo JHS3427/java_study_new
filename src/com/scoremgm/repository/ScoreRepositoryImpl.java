@@ -1,120 +1,154 @@
 package com.scoremgm.repository;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import com.scoremgm.model.Member;
+import com.scoremgm.model.MemberVo;
 
-public class ScoreRepositoryImpl implements ScoreRepository {
+import db.DbConn;
+import db.GenericRepositoryInterface;
 
-	List<Member> storage = new ArrayList<Member>();
+public class ScoreRepositoryImpl extends DbConn 
+			implements GenericRepositoryInterface<MemberVo>{
+	
+	public ScoreRepositoryImpl() { super(); } 
 	
 	@Override
-	public int getCount() {
-		return storage.size();
-	}
-	
-	@Override
-	public boolean insert(Member member) {
-		if(member == null)
-		{return false;}
-		
-		return storage.add(member);	
-	}
-	@Override
-	public List<Member> findAll()
-	{
-		return storage;
-	}
-	
-	@Override
-	public Member find(String no)
-	{
-		Member member = null;
-		no = "2025-"+no;
-		if(no != null)
+	public int insert(MemberVo member) {
+		int rows = 0;
+		String sql = """
+				insert into score_member(name,department,kor,eng,math,mdate)
+				values(?,?,?,?,?,now())
+				""";
+		try
 		{
-			for (Member m : storage)
-			{
-				if(m.getNo().equals(no))
-				{
-					member= m;
-				}
-			}
-			//외부에서 생성된 member 변수의 scope Iterable 관리
-			/*forEach의 경우 메소드 취급이라서 메소드 새로부르면 스택 밀림. 그에따라
-			*앞에서 선언한 member 변수가 사라져 버리고, 이에따라 member=m;에서 에러가 발생함.
-			*
-			* 강사님 설명 : forEach의 경우 메소드 호출이므로 스택에 새로운 블록으로 생성되어 실행됨.
-			* 이에따라 전에 실행중이던 find 메소드를 일시 중지하고 실행 주도권이 forEach로 넘어옴.
-			* 이에 따라 find의 member 변수는 삭제됨. 따라서 member=m;에 접근이 안됨. 이는 자바스크립트에서도 마찬가지.
-			*/
-//			storage.forEach(m ->
-//			{
-//				if(m.getNo().equals(no))
-//				{
-//					member = m;
-//				}
-//			});
+			getPreparedStatement(sql);
+			pstmt.setString(1, member.getName());
+			pstmt.setString(2, member.getDepartment());
+			pstmt.setInt(3, member.getKor());
+			pstmt.setInt(4, member.getEng());
+			pstmt.setInt(5, member.getMath());
+			rows = pstmt.executeUpdate();
 		}
-		else
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return rows;
+	}
+	
+//	@Override
+//	public void remove(String no) {
+//		no = "2025-" + no;
+//		Iterator<MemberVo> ie = storage.iterator();
+//		while(ie.hasNext()) {
+//			MemberVo memeber = ie.next();
+//			if(memeber.getNo().equals(no)) {
+//				ie.remove();
+//				break;
+//			}
+//		}
+//	}
+//	
+//	
+//	@Override
+//	public void update(MemberVo member) {
+//		int idx = -1;
+//		for(int i=0; i<storage.size();i++) {
+//			MemberVo m = storage.get(i);
+//			if(m.getNo().equals(member.getNo())) {
+//				idx = i;
+//				break;
+//			}
+//		}
+//		
+//		storage.set(idx, member);
+//	}
+//	
+//	
+	@Override
+	public MemberVo find(String mid) {
+		MemberVo member = null;
+		String sql = """
+				select mid , name , department, kor, eng, math, mdate
+				from score_member
+				where mid = ?
+				""";
+		try
+		{
+			getPreparedStatement(sql);
+			pstmt.setString(1,mid);
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				member = new MemberVo();
+				member.setMid(rs.getString(1));
+				member.setName(rs.getString(2));
+				member.setDepartment(rs.getString(3));
+				member.setEng(rs.getInt(4));
+				member.setKor(rs.getInt(5));
+				member.setMath(rs.getInt(6));
+				member.setMdate(rs.getString(7));
+			}
+		}
+		catch(Exception e)
 		{
 			
 		}
 		return member;
-		//아래는 내방식
-//		for (Member m : storage)
-//		{
-//			if(m.getNo().equals(no))
-//			{
-//				return m;
-//			}
-//		}
-//		return null;
 	}
-	
+//	
 	@Override
-	public void update(Member member)
-	{
-		int idx= -1;
-		for (int i = 0 ; i < storage.size();i++)
+	public List<MemberVo> findAll() {
+		List<MemberVo> list = new ArrayList<MemberVo>();
+		String sql = """
+				select row_number() over() as rno, 
+				mid , name , department, kor, eng, math, mdate
+				from score_member
+				""";
+		try
 		{
-			Member m = storage.get(i);
-			if(m.getNo().equals(member.getNo()))
+			getPreparedStatement(sql);
+			rs = pstmt.executeQuery();
+			while(rs.next())
 			{
-				idx = i;
-				break;
+				MemberVo member = new MemberVo();
+				member.setRno(rs.getInt(1));
+				member.setMid(rs.getString(2));
+				member.setName(rs.getString(3));
+				member.setDepartment(rs.getString(4));
+				member.setEng(rs.getInt(5));
+				member.setKor(rs.getInt(6));
+				member.setMath(rs.getInt(7));
+				member.setMdate(rs.getString(8));
+				
+				list.add(member);
 			}
 		}
-		storage.set(idx, member);
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return list;
+	}
+//	
+	@Override
+	public int getCount() {
+		int rows =0;
+		String sql = "select count(*) from score_member";
+		try
+		{
+			getPreparedStatement(sql);
+			rs = pstmt.executeQuery();
+			while(rs.next())
+				{rows = rs.getInt(1);}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return rows;
 	}
 	
-	@Override
-	public void remove(String no)
-	{
-//		내가 한 방식
-//		Iterator<Member> ie = storage.iterator();
-//		while(ie.hasNext())
-//		{
-//			Member n1 = ie.next();
-//			if(n1.getNo().equals(no))
-//			{
-//				ie.remove();
-//			}
-//		}
-		//강사님 방식
-		//iterator은 storage 안에 있는걸 순서대로 꺼냈다가(인덱스 기억) 처리할거 하고 인덱스대로 다시 넣는거다.
-		//따라서 다른 변수로 만드는게 아니라 storage를 건드는 셈이다.
-		Iterator<Member> ie = storage.iterator();
-		while(ie.hasNext())
-		{
-			Member member = ie.next();
-			if(member.getNo().equals("2025-"+no))
-			{
-				ie.remove();
-				break;
-			}
-		}
-	}
+	
 }

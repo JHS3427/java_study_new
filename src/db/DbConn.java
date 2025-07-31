@@ -26,7 +26,7 @@ public class DbConn {
 			//1단계 : 연결
 			//Connection connection = DriverManager.getConnection(String url, String user, String password);
 			connection = DriverManager.getConnection(url, user, password);
-			System.out.println("1단계 성공");
+//			System.out.println("1단계 성공");
 		}
 		catch(Exception e)
 		{
@@ -41,7 +41,7 @@ public class DbConn {
 		try
 		{
 			stmt = connection.createStatement();
-			System.out.println("2단계 성공");
+//			System.out.println("2단계 성공");
 		}
 		catch(Exception e){e.printStackTrace();}
 		//return stmt;
