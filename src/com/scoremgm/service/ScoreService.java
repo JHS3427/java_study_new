@@ -2,12 +2,12 @@ package com.scoremgm.service;
 
 public interface ScoreService {
 	public void register();
-	public void exit();
 	public void list();
 	public void search();
-//	public void update();
-//	public void delete();
+	public void update();
+	public void delete();
 	public int getCount();
+	public void exit();
 }
 /*
 1. 학생 등록<br>

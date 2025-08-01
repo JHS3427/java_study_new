@@ -37,8 +37,8 @@ public class ScoreRepositoryImpl extends DbConn
 		return rows;
 	}
 	
-//	@Override
-//	public void remove(String no) {
+	@Override
+	public int remove(String id) {
 //		no = "2025-" + no;
 //		Iterator<MemberVo> ie = storage.iterator();
 //		while(ie.hasNext()) {
@@ -48,12 +48,28 @@ public class ScoreRepositoryImpl extends DbConn
 //				break;
 //			}
 //		}
-//	}
+		int rows=0;
+		String sql = """
+				Delete from score_member
+				where mid =?
+				""";
+		try
+		{
+			getPreparedStatement(sql);
+			pstmt.setString(1, id);
+			rows = pstmt.executeUpdate();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return rows;
+	}
 //	
 //	
-//	@Override
-//	public void update(MemberVo member) {
-//		int idx = -1;
+	@Override
+	public int update(MemberVo member) {
+//		int idx = -1; -- DB 안쓰던 시절꺼라 전부 주석처리
 //		for(int i=0; i<storage.size();i++) {
 //			MemberVo m = storage.get(i);
 //			if(m.getNo().equals(member.getNo())) {
@@ -63,8 +79,31 @@ public class ScoreRepositoryImpl extends DbConn
 //		}
 //		
 //		storage.set(idx, member);
-//	}
-//	
+		int rows = 0;
+		String sql = """
+				update score_member
+				set kor = ?,
+				eng = ?,
+				math = ?
+				where Mid = ?
+				""";
+		try
+		{
+			getPreparedStatement(sql);
+			pstmt.setInt(1, member.getKor());
+			pstmt.setInt(2, member.getEng());
+			pstmt.setInt(3, member.getMath());
+			pstmt.setString(4, member.getMid());
+			
+			rows = pstmt.executeUpdate();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return rows;
+	}
+	
 //	
 	@Override
 	public MemberVo find(String mid) {
@@ -85,8 +124,8 @@ public class ScoreRepositoryImpl extends DbConn
 				member.setMid(rs.getString(1));
 				member.setName(rs.getString(2));
 				member.setDepartment(rs.getString(3));
-				member.setEng(rs.getInt(4));
-				member.setKor(rs.getInt(5));
+				member.setKor(rs.getInt(4));
+				member.setEng(rs.getInt(5));
 				member.setMath(rs.getInt(6));
 				member.setMdate(rs.getString(7));
 			}
@@ -117,8 +156,8 @@ public class ScoreRepositoryImpl extends DbConn
 				member.setMid(rs.getString(2));
 				member.setName(rs.getString(3));
 				member.setDepartment(rs.getString(4));
-				member.setEng(rs.getInt(5));
-				member.setKor(rs.getInt(6));
+				member.setKor(rs.getInt(5));
+				member.setEng(rs.getInt(6));
 				member.setMath(rs.getInt(7));
 				member.setMdate(rs.getString(8));
 				
