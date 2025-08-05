@@ -1,17 +1,21 @@
 package java_study_21chap_book_shop.repository;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import java_study_21chap_book_shop.DBInterface.DBConnection;
 import java_study_21chap_book_shop.DBInterface.DBInterface;
 import java_study_21chap_book_shop.model.BookShopBookModel;
 import java_study_21chap_book_shop.model.BookShopCustormer;
+import java_study_21chap_book_shop.model.BookShopReceipt;
 
 public class BookShopMemberRepo extends DBConnection
 implements DBInterface{
 
 	BookShopCustormer bsc;
 	BookShopBookModel bsbm;
+	BookShopReceipt bsr;
 	public BookShopMemberRepo()
 	{
 		super();
@@ -27,14 +31,9 @@ implements DBInterface{
 			if(rs.next())
 			{
 				rows = rs.getString(1);
-				if(rows == "rrr")
-				{
-					System.out.print("ㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ");
-				}
 			}
 			else
 			{
-				System.out.print("aaaaaaaaaaa");
 			}
 		}
 		catch(Exception e)
@@ -42,6 +41,29 @@ implements DBInterface{
 			e.printStackTrace();
 		}
 		return rows;
+	}
+	public void search(String ID,String Name,String phone)
+	{
+		String sql = "select UserPw "
+				+ " from book_market_member "
+				+ " where UserId = ? and UserName = ? and Phone = ?";
+		getPreparedStatement(sql);
+		try
+		{
+			pstmt.setString(1, ID);
+			pstmt.setString(2, Name);
+			pstmt.setString(3, phone);
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				System.out.println(rs.getString(1));
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+				
 	}
 	public ResultSet search(String sql,String ID)
 	{
@@ -70,7 +92,7 @@ implements DBInterface{
 				String pw = rs.getString(1);				
 				System.out.println(pw);
 				System.out.println(inputpw);
-				if(pw == inputpw)
+				if(pw.equals(inputpw))
 				{
 					System.out.print("CCCCCCCCCCCC");
 				}
@@ -130,12 +152,11 @@ implements DBInterface{
 	
 	public void payment(String UserId)
 	{
-		String sql1 = "Select Username, Phone, UserAddress, now() "
-				+ "from book_market_member where UserId = ?";
-		String sql2 = "Select BookId, Amount, AmountPriceSum"
-				+ " from book_market_cart where UserId = ?";
-		String sql3 = "select sum(AmountPriceSum)"
-				+ " from book_market_cart where userid = ?";
+		List<BookShopReceipt> list = new ArrayList<BookShopReceipt>();
+		String sql1 = "select bmm.userId, bmm.useraddress, "
+				+ " bmc.bookId, bmc.amount, bmc.amountpricesum, now() from book_market_member bmm"
+				+ " left outer join book_market_cart bmc on bmc.UserId = bmm.UserId"
+				+ " where bmm.userId = ?";
 		getPreparedStatement(sql1);
 		try
 		{
@@ -143,52 +164,110 @@ implements DBInterface{
 			ResultSet rs = pstmt.executeQuery();
 			while(rs.next())
 			{
-				System.out.print(rs.getString(1) + " \t ");
-				System.out.println(rs.getString(2));
-				System.out.print(rs.getString(3) + " \t ");
-				System.out.println(rs.getString(4));
+				bsr = new BookShopReceipt();
+				bsr.setUserId(rs.getString(1));
+				bsr.setUserAddress(rs.getString(2));
+				bsr.setBookId(rs.getString(3));
+				bsr.setAmount(rs.getInt(4));
+				bsr.setAmountPriceSum(rs.getInt(5));
+				bsr.setBuyingDate(rs.getString(6));
+				list.add(bsr);
 			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		System.out.println("장바구니 상품 목록 : ");
-
-		getPreparedStatement(sql2);
-		try
+		if(bsr.getAmount()!=0)
 		{
-			pstmt.setString(1,UserId);
-			ResultSet rs = pstmt.executeQuery();
+			String sql2 = "insert into book_market_receipt(UserId,BookId,Amount, "
+					+ " AmountPriceSum,BuyingDate,UserAddress) "
+					+ " values(?,?,?,?,?,?)";
+			getPreparedStatement(sql2);
+		
+			list.forEach(bdate -> {
+				try
+				{
+					pstmt.setString(1,bdate.getUserId());
+					pstmt.setString(2,bdate.getBookId());
+					pstmt.setInt(3,bdate.getAmount());
+					pstmt.setInt(4,bdate.getAmountPriceSum());
+					pstmt.setString(5,bdate.getBuyingDate());
+					pstmt.setString(6,bdate.getUserAddress());
+					pstmt.executeUpdate();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			});
+		}
+	}
+	public void paymentshow(String ID)
+	{
+		String sql = "select UserName, phone, UserAddress, now() from book_market_member"
+				+ " where userid = ?";
+		String sql2 = "select bookId, amount, amountpricesum from book_market_receipt "
+				+ " where userId = ?";
+		String sql3 = "select sum(amountpricesum) from book_market_receipt "
+				+ " where userId = ?";
+		ResultSet rs = search(sql,ID);
+		ResultSet rs2 = search(sql2,ID);
+		ResultSet rs3 = search(sql3,ID);
+		try {
 			while(rs.next())
 			{
-				System.out.print(rs.getString(1) + " \t ");
-				System.out.print(rs.getInt(2) + " \t ");
-				System.out.println(rs.getInt(3));
+				System.out.println("이름 : "+rs.getString(1));
+				System.out.println("전화번호 : " +rs.getString(2));
+				System.out.println("주소 : "+rs.getString(3));
+				System.out.println("배송일 : "+rs.getString(4));
 			}
+			while(rs2.next())
+			{
+				System.out.print("책 ID : "+rs2.getString(1) + " \t ");
+				System.out.print("수량 : " +rs2.getInt(2) + " \t ");
+				System.out.println("해당 책의 총 가격 : "+rs2.getInt(3));
+			}
+			while(rs3.next())
+			{
+				System.out.println("총액 : "+rs3.getInt(1));
+			}
+			rs.close();
+			rs2.close();
+			rs3.close();
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		System.out.print("장바구니 상품 총 금액 : ");
-
-		getPreparedStatement(sql3);
-		try
-		{
-			pstmt.setString(1,UserId);
-			ResultSet rs = pstmt.executeQuery();
+	}
+	public void paymentshow(String NName, String NPhone, String NAddress, String ID)
+	{
+		String sql = "select bookId, amount, amountpricesum from book_market_receipt "
+				+ " where userId = ?";
+		String sql2 = "select sum(amountpricesum) from book_market_receipt "
+				+ " where userId = ?";
+		System.out.println("이름 : "+ NName);
+		System.out.println("전화번호 : " +NPhone);
+		System.out.println("주소 : "+ NAddress);
+		System.out.println("배송일 : ???");
+		ResultSet rs = search(sql,ID);
+		ResultSet rs2 = search(sql2,ID);		
+		try {
 			while(rs.next())
 			{
-				System.out.print(rs.getInt(1) + " \t ");
+				System.out.print("책 ID : "+rs.getString(1) + " \t ");
+				System.out.print("수량 : " +rs.getInt(2) + " \t ");
+				System.out.println("해당 책의 총 가격 : "+rs.getInt(3));
+			}
+			while(rs2.next())
+			{
+				System.out.println("총액 : "+rs2.getInt(1));
 			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		
 	}
 }

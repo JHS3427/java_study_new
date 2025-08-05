@@ -117,21 +117,28 @@ implements DBInterface{
 			e.printStackTrace();
 		}
 		System.out.println("가격은 : " + price);
-		String sql2 = "Insert into book_market_cart"
-				+ "(UserId, BookId, Amount, AmountPriceSum) "
-				+ "values (?,?,?,?)";
-		try
+		if(price == 0)
 		{
-			getPreparedStatement(sql2);
-			pstmt.setString(1, UserId);
-			pstmt.setString(2, bookId);
-			pstmt.setInt(3, Amount);
-			pstmt.setInt(4, Amount * price);
-			rows = pstmt.executeUpdate();
+			System.out.println("책 ID 입력값이 이상합니다.");
 		}
-		catch(Exception e)
+		else
 		{
-			e.printStackTrace();
+			String sql2 = "Insert into book_market_cart"
+					+ "(UserId, BookId, Amount, AmountPriceSum) "
+					+ "values (?,?,?,?)";
+			try
+			{
+				getPreparedStatement(sql2);
+				pstmt.setString(1, UserId);
+				pstmt.setString(2, bookId);
+				pstmt.setInt(3, Amount);
+				pstmt.setInt(4, Amount * price);
+				rows = pstmt.executeUpdate();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		return rows;
 	}

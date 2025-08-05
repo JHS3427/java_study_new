@@ -38,7 +38,7 @@ create table book_market_cart(
 );
 select * from book_market_member;
 Insert into book_market_member
-values("rrr","sss","가나다","한국","010-1111-1111");
+values("aaa","aaa","그그그","북한","010-1234-5678");
 
 desc book_market_books;
 desc book_market_member;
@@ -88,3 +88,18 @@ select bmm.Username, bmm.Phone, bmm.UserAddress
 from book_market_member bmm
 inner join book_market_cart bmc
 on bmm.UserId = bmc.userID;
+
+select * from book_market_member;
+select * from book_market_cart;
+select * from book_market_receipt;
+delete from book_market_receipt where userId='rrr';
+desc book_market_receipt;
+
+select bmm.userId, bmm.userPw, bmm.username, bmm.useraddress, bmm.phone,
+bmc.bookId, bmc.amount, bmc.amountpricesum from book_market_member bmm
+left outer join book_market_cart bmc on bmc.UserId = bmm.UserId
+where bmm.userId = "aaa";
+select bmm.userId, bmm.userPw, bmm.username, bmm.useraddress, bmm.phone,
+bmc.bookId, bmc.amount, bmc.amountpricesum from book_market_member bmm
+left outer join book_market_cart bmc on bmc.UserId = bmm.UserId
+where bmm.userId = "aaa";
